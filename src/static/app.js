@@ -20,39 +20,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        // Participants list HTML with delete icon
-        let participantsHTML = "";
+        // Create activity name
+        const h4 = document.createElement("h4");
+        h4.textContent = name;
+        activityCard.appendChild(h4);
+
+        // Create description
+        const descP = document.createElement("p");
+        descP.textContent = details.description;
+        activityCard.appendChild(descP);
+
+        // Create schedule
+        const scheduleP = document.createElement("p");
+        const scheduleStrong = document.createElement("strong");
+        scheduleStrong.textContent = "Schedule:";
+        scheduleP.appendChild(scheduleStrong);
+        scheduleP.appendChild(document.createTextNode(" " + details.schedule));
+        activityCard.appendChild(scheduleP);
+
+        // Create availability
+        const availP = document.createElement("p");
+        const availStrong = document.createElement("strong");
+        availStrong.textContent = "Availability:";
+        availP.appendChild(availStrong);
+        availP.appendChild(document.createTextNode(` ${spotsLeft} spots left`));
+        activityCard.appendChild(availP);
+
+        // Participants section
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants-section";
+        const participantsStrong = document.createElement("strong");
+        participantsStrong.textContent = "Participants:";
+        participantsSection.appendChild(participantsStrong);
+
         if (details.participants.length > 0) {
-          participantsHTML = `
-            <div class="participants-section">
-              <strong>Participants:</strong>
-              <ul class="participants-list">
-                ${details.participants.map(p => `
-                  <li>
-                    <span class="participant-email">${p}</span>
-                    <span class="delete-icon" title="Remove participant" data-activity="${name}" data-email="${p}">&times;</span>
-                  </li>
-                `).join("")}
-              </ul>
-            </div>
-          `;
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+          details.participants.forEach(p => {
+            const li = document.createElement("li");
+            const emailSpan = document.createElement("span");
+            emailSpan.className = "participant-email";
+            emailSpan.textContent = p;
+            const deleteIcon = document.createElement("span");
+            deleteIcon.className = "delete-icon";
+            deleteIcon.title = "Remove participant";
+            deleteIcon.textContent = "×";
+            deleteIcon.setAttribute("data-activity", name);
+            deleteIcon.setAttribute("data-email", p);
+            li.appendChild(emailSpan);
+            li.appendChild(deleteIcon);
+            ul.appendChild(li);
+          });
+          participantsSection.appendChild(ul);
         } else {
-          participantsHTML = `
-            <div class="participants-section">
-              <strong>Participants:</strong>
-              <p class="no-participants">No participants yet.</p>
-            </div>
-          `;
+          const noP = document.createElement("p");
+          noP.className = "no-participants";
+          noP.textContent = "No participants yet.";
+          participantsSection.appendChild(noP);
         }
-
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          ${participantsHTML}
-        `;
-
+        activityCard.appendChild(participantsSection);
         // Add event listener for delete icons after rendering
         setTimeout(() => {
           activityCard.querySelectorAll('.delete-icon').forEach(icon => {
